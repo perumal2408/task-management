@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "63188644980",
+    "project_id": "task-management-5101e",
+    "storage_bucket": "task-management-5101e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63188644980:android:0b859766421a496ea28d21",
+        "android_client_info": {
+          "package_name": "com.example.task_management_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3bV6vgIBpNxCTyR9QOOx2ViHVL8_IBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63188644980:android:eac765717d2caa70a28d21",
+        "android_client_info": {
+          "package_name": "com.laxman.tskmgmt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3bV6vgIBpNxCTyR9QOOx2ViHVL8_IBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63188644980:android:b076ba6cebbe672fa28d21",
+        "android_client_info": {
+          "package_name": "com.laxman.tskmngmt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3bV6vgIBpNxCTyR9QOOx2ViHVL8_IBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
