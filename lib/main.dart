@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_page.dart'; // Main task tracking page
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -26,8 +27,17 @@ class MyApp extends StatelessWidget {
 }
 
 class SignInScreen extends StatelessWidget {
-  // Define the list of allowed email IDs
-  final List<String> allowedEmails = ['perumal.laxman@thehindu.co.in', 'jayashree.manickavel@gmail.com'];
+  Future<bool> isEmailAllowed(String email) async {
+    try {
+      // Fetching allowed emails from Firestore
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('allowedEmails').get();
+      List<String> allowedEmails = snapshot.docs.map((doc) => doc['email'] as String).toList();
+      return allowedEmails.contains(email);
+    } catch (e) {
+      print('Error fetching allowed emails: $e');
+      return false;
+    }
+  }
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
@@ -42,12 +52,12 @@ class SignInScreen extends StatelessWidget {
       final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       final User? user = userCredential.user;
 
-      // Check if the signed-in email is in the allowed list
-      if (user != null && allowedEmails.contains(user.email)) {
-        // If the email is allowed, navigate to the HomePage
+      // Check if the signed-in email is allowed
+      if (user != null && await isEmailAllowed(user.email!)) {
+        // If email is allowed, navigate to HomePage
         Navigator.pushReplacementNamed(context, '/home');
       } else {
-        // If the email is not allowed, sign out and show error
+        // Sign out and show error if the email is not allowed
         await FirebaseAuth.instance.signOut();
         await GoogleSignIn().signOut();
         ScaffoldMessenger.of(context).showSnackBar(
