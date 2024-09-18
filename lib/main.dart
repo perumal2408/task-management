@@ -1,9 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'home_page.dart'; // Main task tracking page
-import 'login_page.dart'; // Make sure you have this file
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,32 +16,48 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Team Task Tracker',
       theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: '/',
+      home: SignInScreen(),
       routes: {
-        '/': (context) => SignInScreen(),
         '/home': (context) => HomePage(),
-        '/login': (context) => LoginPage(), // Ensure this route is defined
+        '/login': (context) => SignInScreen(),
       },
     );
   }
 }
 
 class SignInScreen extends StatelessWidget {
+  // Define the list of allowed email IDs
+  final List<String> allowedEmails = ['perumal.laxman@thehindu.co.in', 'jayashree.manickavel@gmail.com'];
+
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return; // User cancelled the sign-in
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      Navigator.pushReplacementNamed(context, '/home');
+      // Sign in to Firebase with the Google credentials
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      // Check if the signed-in email is in the allowed list
+      if (user != null && allowedEmails.contains(user.email)) {
+        // If the email is allowed, navigate to the HomePage
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // If the email is not allowed, sign out and show error
+        await FirebaseAuth.instance.signOut();
+        await GoogleSignIn().signOut();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Your email is not authorized to use this app.')),
+        );
+      }
     } catch (e) {
-      print('Error signing in: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing in: $e')),
+      );
     }
   }
 
