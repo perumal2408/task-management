@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'task_service.dart'; // Make sure you have this service for task operations
 
 class HomePage extends StatefulWidget {
@@ -125,7 +126,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> _signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
-      Navigator.pushReplacementNamed(context, '/login'); // Navigate to login page
+      await GoogleSignIn().signOut(); // Ensure Google Sign-In is signed out
+      Navigator.pushReplacementNamed(context, '/'); // Navigate to the sign-in page
     } catch (e) {
       print('Error signing out: $e');
     }
