@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
-import 'task_service.dart';
+import 'task_service.dart'; // Make sure you have this service for task operations
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,17 +20,12 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              // Navigate back to login page or show sign-in screen
-              Navigator.pushReplacementNamed(context, '/login');
-            },
+            onPressed: _signOut,
           ),
         ],
       ),
       body: Column(
         children: [
-          // Task input field
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -42,9 +36,7 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.send),
                   onPressed: () {
                     if (_taskController.text.isNotEmpty) {
-                      _taskService
-                          .addOrUpdateTask(_taskController.text)
-                          .then((_) {
+                      _taskService.addOrUpdateTask(_taskController.text).then((_) {
                         setState(() {});
                         _taskController.clear();
                       });
@@ -54,7 +46,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          // Display today's tasks
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: _taskService.getTasksByDate(DateTime.now()),
@@ -73,8 +64,7 @@ class _HomePageState extends State<HomePage> {
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
                     var taskData = tasks[index];
-                    bool isCurrentUser =
-                        taskData['email'] == currentUser?.email;
+                    bool isCurrentUser = taskData['email'] == currentUser?.email;
 
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -86,8 +76,7 @@ class _HomePageState extends State<HomePage> {
                                 icon: Icon(Icons.edit),
                                 onPressed: () {
                                   _taskController.text = taskData['task'];
-                                  _editingTaskId = taskData[
-                                      'email']; // Track the task being edited
+                                  _editingTaskId = taskData['email'];
                                   showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
@@ -101,14 +90,10 @@ class _HomePageState extends State<HomePage> {
                                       actions: [
                                         TextButton(
                                           onPressed: () async {
-                                            if (_taskController
-                                                .text.isNotEmpty) {
-                                              await _taskService
-                                                  .addOrUpdateTask(
-                                                      _taskController.text);
+                                            if (_taskController.text.isNotEmpty) {
+                                              await _taskService.addOrUpdateTask(_taskController.text);
                                               Navigator.pop(context);
-                                              setState(
-                                                  () {}); // Refresh the task list
+                                              setState(() {});
                                             }
                                           },
                                           child: Text('Save'),
@@ -135,5 +120,14 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.pushReplacementNamed(context, '/login'); // Navigate to login page
+    } catch (e) {
+      print('Error signing out: $e');
+    }
   }
 }
